@@ -80,15 +80,22 @@ CHECK_INTERVAL_MINUTES=10
 
 **オプションB: GitHub Actions（無料プラン推奨）**
 
-1. GitHubリポジトリの **Settings** → **Secrets and variables** → **Actions** を開く
+詳細な手順は [GITHUB_ACTIONS_SETUP.md](GITHUB_ACTIONS_SETUP.md) を参照してください。
 
-2. 新しいシークレットを追加：
+簡易手順：
+
+1. GitHubのWebインターフェースで `.github/workflows/cron-check-drive.yml` を作成
+   - 詳細は [GITHUB_ACTIONS_SETUP.md](GITHUB_ACTIONS_SETUP.md) 参照
+
+2. GitHubリポジトリの **Settings** → **Secrets and variables** → **Actions** を開く
+
+3. 新しいシークレットを追加：
    - Name: `VERCEL_FUNCTION_URL`
    - Value: `https://your-project.vercel.app`（VercelのプロジェクトURL）
 
-3. `.github/workflows/cron-check-drive.yml` が自動的に10分ごとに実行されます
+4. ワークフローが自動的に10分ごとに実行されます
 
-4. 手動実行も可能：
+5. 手動実行も可能：
    - GitHubリポジトリの **Actions** タブを開く
    - "Check Google Drive (Cron)" を選択
    - "Run workflow" をクリック
