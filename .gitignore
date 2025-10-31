@@ -6,6 +6,9 @@ cloud_env_vars.txt
 credentials.json
 token.pickle
 
+# GitHub Actions (ユーザーが手動で作成)
+.github/
+
 # Python
 __pycache__/
 *.py[cod]
