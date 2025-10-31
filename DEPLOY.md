@@ -4,14 +4,140 @@
 
 ## 目次
 
-1. [Docker + Docker Compose（推奨）](#1-docker--docker-compose推奨)
-2. [Railway（クラウド、無料枠あり）](#2-railwayクラウド無料枠あり)
-3. [Render（クラウド、無料枠あり）](#3-renderクラウド無料枠あり)
-4. [systemd（Linuxサーバー）](#4-systemdlinuxサーバー)
+1. [Vercel（サーバーレス、無料枠あり）](#1-vercelサーバーレス無料枠あり)
+2. [Docker + Docker Compose（推奨）](#2-docker--docker-compose推奨)
+3. [Railway（クラウド、無料枠あり）](#3-railwayクラウド無料枠あり)
+4. [Render（クラウド、無料枠あり）](#4-renderクラウド無料枠あり)
+5. [systemd（Linuxサーバー）](#5-systemdlinuxサーバー)
 
 ---
 
-## 1. Docker + Docker Compose（推奨）
+## 1. Vercel（サーバーレス、無料枠あり）
+
+Vercelはサーバーレス関数として実行します。Cron Jobsまたは外部サービスから定期的に呼び出されます。
+
+### 特徴
+
+- 完全無料で利用可能（無料枠内）
+- サーバー不要、メンテナンスフリー
+- GitHubと連携した自動デプロイ
+- 定期実行はVercel Cron Jobs（Proプラン）またはGitHub Actions（無料）で実現
+
+### 前提条件
+
+- [Vercel](https://vercel.com/)アカウント
+- GitHubリポジトリ
+- ローカルで `credentials.json` と `token.pickle` を取得済み
+
+### 手順
+
+#### 1.1 認証情報の準備
+
+ローカルで認証情報をbase64エンコードします：
+
+```bash
+# Linux/Mac
+./scripts/prepare_cloud_deploy.sh
+
+# Windows
+.\scripts\prepare_cloud_deploy.ps1
+```
+
+生成された `cloud_env_vars.txt` の内容を控えておきます。
+
+#### 1.2 Vercelプロジェクトの作成
+
+1. [Vercel Dashboard](https://vercel.com/dashboard)にログイン
+2. "Add New..." → "Project" をクリック
+3. GitHubリポジトリをインポート
+4. このリポジトリを選択
+
+#### 1.3 環境変数の設定
+
+Vercelのプロジェクト設定で以下の環境変数を追加：
+
+**Settings** → **Environment Variables** から以下を設定：
+
+```
+ANTHROPIC_API_KEY=sk-ant-xxxxx
+LINE_CHANNEL_ACCESS_TOKEN=xxxxx
+LINE_USER_ID=Uxxxxx
+DRIVE_FOLDER_ID=xxxxx（オプション）
+GOOGLE_CREDENTIALS_BASE64=[cloud_env_vars.txtから取得]
+GOOGLE_TOKEN_BASE64=[cloud_env_vars.txtから取得]
+CHECK_INTERVAL_MINUTES=10
+```
+
+#### 1.4 デプロイ
+
+"Deploy" をクリックしてデプロイを開始します。数分でデプロイが完了します。
+
+#### 1.5 定期実行の設定
+
+**オプションA: Vercel Cron Jobs（Proプランのみ）**
+
+`vercel.json` にCron設定が含まれているため、自動的に10分ごとに実行されます。
+
+**オプションB: GitHub Actions（無料プラン推奨）**
+
+1. GitHubリポジトリの **Settings** → **Secrets and variables** → **Actions** を開く
+
+2. 新しいシークレットを追加：
+   - Name: `VERCEL_FUNCTION_URL`
+   - Value: `https://your-project.vercel.app`（VercelのプロジェクトURL）
+
+3. `.github/workflows/cron-check-drive.yml` が自動的に10分ごとに実行されます
+
+4. 手動実行も可能：
+   - GitHubリポジトリの **Actions** タブを開く
+   - "Check Google Drive (Cron)" を選択
+   - "Run workflow" をクリック
+
+#### 1.6 動作確認
+
+1. GitHub Actionsの実行ログを確認
+2. LINEに通知が届くことを確認
+3. Vercelのログを確認：
+   - Vercel Dashboard → プロジェクト → **Functions** タブ
+   - `/api/check-drive` のログを確認
+
+### トラブルシューティング
+
+#### 関数タイムアウト
+
+```
+Error: Function execution timed out
+```
+
+→ `vercel.json` の `maxDuration` を増やす（Proプランでは最大300秒）
+
+#### 認証エラー
+
+```
+Error: Failed to authenticate with Google Drive API
+```
+
+→ `GOOGLE_CREDENTIALS_BASE64` と `GOOGLE_TOKEN_BASE64` が正しく設定されているか確認
+
+#### GitHub Actionsが実行されない
+
+→ リポジトリの **Settings** → **Actions** → **General** で "Allow all actions and reusable workflows" が有効になっているか確認
+
+### コスト
+
+- **Vercel無料枠**:
+  - サーバーレス関数実行: 100GB-時間/月
+  - デプロイ: 100回/日
+  - 帯域幅: 100GB/月
+
+- **GitHub Actions無料枠**:
+  - 2,000分/月（パブリックリポジトリは無制限）
+
+10分ごとに実行する場合、月間約4,320回の実行で、完全に無料枠内で運用可能です。
+
+---
+
+## 2. Docker + Docker Compose（推奨）
 
 Dockerを使用した最もシンプルで移植性の高いデプロイ方法です。
 
@@ -88,7 +214,7 @@ docker-compose logs --tail=100 drive-monitor
 
 ---
 
-## 2. Railway（クラウド、無料枠あり）
+## 3. Railway（クラウド、無料枠あり）
 
 Railwayは簡単にアプリケーションをデプロイできるクラウドプラットフォームです。
 
@@ -165,7 +291,7 @@ if credentials_base64:
 
 ---
 
-## 3. Render（クラウド、無料枠あり）
+## 4. Render（クラウド、無料枠あり）
 
 Renderは無料枠が充実したクラウドプラットフォームです。
 
@@ -233,7 +359,7 @@ GOOGLE_TOKEN_BASE64=[base64エンコードされたtoken.pickle]
 
 ---
 
-## 4. systemd（Linuxサーバー）
+## 5. systemd（Linuxサーバー）
 
 既存のLinuxサーバーがある場合、systemdサービスとして実行できます。
 
@@ -405,18 +531,20 @@ if token_base64 and not os.path.exists('token.pickle'):
 
 | 環境 | 推奨度 | メリット | デメリット |
 |------|--------|----------|------------|
+| Vercel | ⭐⭐⭐⭐⭐ | 完全無料、サーバー不要、メンテナンスフリー | サーバーレスなので継続的プロセスには向かない（Cron必要） |
 | Docker Compose | ⭐⭐⭐⭐⭐ | 簡単、移植性高い、ローカルでもクラウドでも動く | Dockerの知識が必要 |
 | systemd | ⭐⭐⭐⭐ | 既存サーバーを活用、フルコントロール | サーバー管理の知識が必要 |
 | Railway | ⭐⭐⭐ | 簡単、自動デプロイ、無料枠あり | OAuth認証の対応が必要 |
 | Render | ⭐⭐⭐ | 無料枠が充実、信頼性高い | OAuth認証の対応が必要 |
 
 ### 初心者向け
-- ローカルで試す: **Docker Compose**
-- 無料でクラウド: **Render**
+- **完全無料でクラウド**: **Vercel + GitHub Actions**
+- **ローカルで試す**: **Docker Compose**
 
 ### 本番運用向け
-- フルコントロール: **systemd（VPS）**
-- 簡単運用: **Docker Compose（クラウドVM）**
+- **コスト重視**: **Vercel**（完全無料）
+- **フルコントロール**: **systemd（VPS）**
+- **簡単運用**: **Docker Compose（クラウドVM）**
 
 ---
 

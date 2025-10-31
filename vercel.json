@@ -1,0 +1,21 @@
+{
+  "functions": {
+    "api/check-drive.py": {
+      "runtime": "python3.9",
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/check-drive",
+      "schedule": "*/10 * * * *"
+    }
+  ],
+  "env": {
+    "ANTHROPIC_API_KEY": "@anthropic_api_key",
+    "LINE_CHANNEL_ACCESS_TOKEN": "@line_channel_access_token",
+    "LINE_USER_ID": "@line_user_id",
+    "GOOGLE_CREDENTIALS_BASE64": "@google_credentials_base64",
+    "GOOGLE_TOKEN_BASE64": "@google_token_base64"
+  }
+}

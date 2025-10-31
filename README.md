@@ -38,10 +38,11 @@ docker-compose logs -f
 
 以下のデプロイオプションに対応しています：
 
-- Docker + Docker Compose（推奨）
-- Railway（クラウド、無料枠あり）
-- Render（クラウド、無料枠あり）
-- systemd（Linuxサーバー）
+- **Vercel**（サーバーレス、完全無料）
+- **Docker + Docker Compose**（推奨、ローカル/サーバー）
+- **Railway**（クラウド、無料枠あり）
+- **Render**（クラウド、無料枠あり）
+- **systemd**（Linuxサーバー）
 
 ## セットアップ
 
