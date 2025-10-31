@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  drive-monitor:
+    build: .
+    container_name: google-drive-monitor
+    restart: unless-stopped
+    environment:
+      - DRIVE_CREDENTIALS_FILE=${DRIVE_CREDENTIALS_FILE:-credentials.json}
+      - DRIVE_FOLDER_ID=${DRIVE_FOLDER_ID}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN}
+      - LINE_USER_ID=${LINE_USER_ID}
+      - POLL_INTERVAL=${POLL_INTERVAL:-300}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-10485760}
+      - SUMMARY_MAX_LENGTH=${SUMMARY_MAX_LENGTH:-5000}
+    volumes:
+      # credentials.jsonとtoken.pickleを永続化
+      - ./credentials.json:/app/credentials.json:ro
+      - token-data:/app/token-data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  token-data:

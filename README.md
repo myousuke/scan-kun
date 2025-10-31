@@ -9,6 +9,40 @@ Google Driveを監視し、新しいファイルが追加されたらLLMでサ�
 - Claude APIを使用してファイル内容のサマリーを生成
 - LINE Messaging APIでサマリーを送信
 
+## クイックスタート
+
+### オプション1: Docker Compose（推奨）
+
+```bash
+# 環境変数を設定
+cp .env.example .env
+# .envを編集
+
+# credentials.jsonを配置
+cp /path/to/your/credentials.json ./credentials.json
+
+# 起動
+docker-compose up -d
+
+# ログを確認
+docker-compose logs -f
+```
+
+### オプション2: Python直接実行
+
+詳細は [SETUP.md](SETUP.md) を参照してください。
+
+## デプロイ
+
+本番環境へのデプロイ方法は [DEPLOY.md](DEPLOY.md) を参照してください。
+
+以下のデプロイオプションに対応しています：
+
+- Docker + Docker Compose（推奨）
+- Railway（クラウド、無料枠あり）
+- Render（クラウド、無料枠あり）
+- systemd（Linuxサーバー）
+
 ## セットアップ
 
 ### 1. 必要なパッケージのインストール

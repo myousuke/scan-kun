@@ -31,7 +31,31 @@ class GoogleDriveMonitor:
 
     def _authenticate(self):
         """Google Drive APIの認証を行う"""
+        import base64
+
         creds = None
+
+        # 環境変数からcredentials.jsonを復元（クラウドデプロイ用）
+        credentials_base64 = os.getenv('GOOGLE_CREDENTIALS_BASE64')
+        if credentials_base64 and not os.path.exists(self.credentials_file):
+            try:
+                credentials_json = base64.b64decode(credentials_base64).decode('utf-8')
+                with open(self.credentials_file, 'w') as f:
+                    f.write(credentials_json)
+                print("環境変数からcredentials.jsonを復元しました")
+            except Exception as e:
+                print(f"credentials.json復元エラー: {e}")
+
+        # 環境変数からtoken.pickleを復元（クラウドデプロイ用）
+        token_base64 = os.getenv('GOOGLE_TOKEN_BASE64')
+        if token_base64 and not os.path.exists('token.pickle'):
+            try:
+                token_data = base64.b64decode(token_base64)
+                with open('token.pickle', 'wb') as token:
+                    token.write(token_data)
+                print("環境変数からtoken.pickleを復元しました")
+            except Exception as e:
+                print(f"token.pickle復元エラー: {e}")
 
         # token.pickleファイルがあれば読み込む
         if os.path.exists('token.pickle'):

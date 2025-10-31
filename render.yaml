@@ -1,0 +1,23 @@
+services:
+  - type: worker
+    name: google-drive-monitor
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DRIVE_CREDENTIALS_FILE
+        value: credentials.json
+      - key: DRIVE_FOLDER_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
+      - key: LINE_USER_ID
+        sync: false
+      - key: POLL_INTERVAL
+        value: "300"
+      - key: MAX_FILE_SIZE
+        value: "10485760"
+      - key: SUMMARY_MAX_LENGTH
+        value: "5000"
+    autoDeploy: true

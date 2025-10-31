@@ -1,0 +1,29 @@
+[Unit]
+Description=Google Drive Monitor with LLM Summary
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
+WorkingDirectory=/path/to/scan-kun
+Environment="PATH=/path/to/scan-kun/venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=/path/to/scan-kun/.env
+ExecStart=/path/to/scan-kun/venv/bin/python /path/to/scan-kun/main.py
+
+# 再起動設定
+Restart=always
+RestartSec=10
+
+# ログ設定
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=drive-monitor
+
+# セキュリティ設定
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
